@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markys&Co. — Детская одежда</title>
+<style>
+:root {
+  --wine:#741f3e;
+  --cream:#faf6f3;
+  --ink:#30242a;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+}
+header {
+  background:var(--wine);
+  color:white;
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.logo {font-family:Georgia,serif;font-size:27px}
+button {
+  cursor:pointer;
+  border:0;
+  border-radius:8px;
+  padding:12px 17px;
+  font-size:15px;
+}
+.cart-btn {background:white;color:var(--wine)}
+.hero {
+  text-align:center;
+  padding:65px 20px;
+  background:#f0e4e5;
+}
+.hero h1 {
+  font-family:Georgia,serif;
+  font-size:38px;
+  color:var(--wine);
+}
+.hero p {line-height:1.6}
+h2 {text-align:center;color:var(--wine)}
+.catalog {
+  max-width:1100px;
+  margin:auto;
+  padding:30px 18px;
+}
+.products {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:22px;
+}
+.product {
+  background:white;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 3px 14px #00000012;
+}
+.photo {
+  height:260px;
+  background:#eee4e4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#876d78;
+}
+.photo img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.details {padding:20px}
+.details h3 {margin-top:0}
+.price {
+  color:var(--wine);
+  font-size:23px;
+  font-weight:bold;
+}
+select,input,textarea {
+  width:100%;
+  padding:12px;
+  margin:7px 0 15px;
+  border:1px solid #d9cbd0;
+  border-radius:8px;
+  font-size:15px;
+}
+.primary {
+  background:var(--wine);
+  color:white;
+  width:100%;
+}
+.panel {
+  max-width:650px;
+  margin:25px auto;
+  background:white;
+  padding:25px;
+  border-radius:14px;
+}
+.hidden {display:none}
+.cart-line {
+  padding:13px 0;
+  border-bottom:1px solid #eee;
+}
+.total {font-size:21px;font-weight:bold}
+.notice {
+  background:#f8edf0;
+  padding:15px;
+  border-radius:8px;
+  line-height:1.6;
+}
+footer {
+  background:var(--wine);
+  color:white;
+  text-align:center;
+  padding:30px 15px;
+  margin-top:50px;
+  line-height:1.8;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Markys&Co.</div>
+  <button class="cart-btn" onclick="showCart()">
+    Корзина (<span id="count">0</span>)
+  </button>
+</header>
+
+<section class="hero">
+  <h1>Маленькие вещи, большая любовь</h1>
+  <p>
+    Детская одежда и аксессуары с заботой о малышах.
+    <br>Доставка по всей Южной Корее.
+  </p>
+  <button class="primary"
+    style="max-width:220px"
+    onclick="document.getElementById('catalog').scrollIntoView()">
+    Смотреть каталог
+  </button>
+</section>
+
+<section class="catalog" id="catalog">
+  <h2>Наши товары</h2>
+  <div class="products" id="products"></div>
+</section>
+
+<section class="panel hidden" id="cart">
+  <h2>Ваша корзина</h2>
+  <div id="cartItems"></div>
+  <p id="subtotal"></p>
+  <p id="delivery"></p>
+  <p class="total" id="total"></p>
+  <button class="primary" onclick="showCheckout()">
+    Оформить заказ
+  </button>
+  <p>
+    <button onclick="clearCart()">Очистить корзину</button>
+  </p>
+</section>
+
+<section class="panel hidden" id="checkout">
+  <h2>Оформление заказа</h2>
+  <form id="orderForm">
+    <label>Имя покупателя</label>
+    <input id="customer" required maxlength="100">
+
+    <label>Телефон</label>
+    <input id="phone" type="tel" required maxlength="30">
+
+    <label>Адрес доставки в Корее</label>
+    <textarea id="address" required rows="3"></textarea>
+
+    <label>Комментарий</label>
+    <textarea id="comment" rows="2"></textarea>
+
+    <div class="notice">
+      Способ оплаты: банковский перевод.
+      После оформления заказа продавец подтвердит
+      наличие товаров и сообщит реквизиты для оплаты.
+      <br><br>
+      Бесплатная доставка от 50 000 ₩.
+      Стоимость доставки для меньших заказов
+      уточняется у продавца.
+    </div>
+
+    <p>
+      <label>
+        <input type="checkbox" id="consent"
+          style="width:auto" required>
+        Согласен(на) передать контактные данные
+        продавцу для обработки заказа.
+      </label>
+    </p>
+
+    <button class="primary" type="submit">
+      Подготовить заказ
+    </button>
+  </form>
+
+  <div id="orderResult" class="hidden">
+    <h3>Ваш заказ подготовлен</h3>
+    <p>
+      Скопируйте заказ и отправьте продавцу
+      через Instagram Direct.
+      Заказ считается принятым только
+      после подтверждения продавцом.
+    </p>
+    <textarea id="orderText" rows="12" readonly></textarea>
+    <button class="primary" onclick="copyOrder()">
+      Скопировать заказ
+    </button>
+  </div>
+</section>
+
+<footer>
+  <strong>Markys&Co.</strong>
+  <p>Детская одежда с любовью</p>
+  <p>Доставка по всей Южной Корее</p>
+  <p>Бесплатная доставка от 50 000 ₩</p>
+  <p>© 2026 Markys&Co.</p>
+</footer>
+
+<script>
+const products = [
+  {
+    id:"bunny",
+    name:"Комбинезон «Зайка»",
+    price:20000,
+    sizes:["66","73","80","90"],
+    material:"Мягкий флис",
+    image:""
+  }
+];
+
+let cart = [];
+
+function money(n) {
+  return n.toLocaleString("ko-KR")+" ₩";
+}
+
+function renderProducts() {
+  document.getElementById("products").innerHTML =
+    products.map(p => `
+      <article class="product">
+        <div class="photo">
+          ${p.image
+            ? `<img src="${p.image}" alt="${p.name}">`
+            : "Фото товара"}
+        </div>
+        <div class="details">
+          <h3>${p.name}</h3>
+          <p>Материал: ${p.material}</p>
+          <p class="price">${money(p.price)}</p>
+          <label>Выберите размер</label>
+          <select id="size-${p.id}">
+            ${p.sizes.map(s =>
+              `<option value="${s}">${s}</option>`
+            ).join("")}
+          </select>
+          <button class="primary"
+            onclick="addToCart('${p.id}')">
+            Добавить в корзину
+          </button>
+        </div>
+      </article>
+    `).join("");
+}
+
+function addToCart(id) {
+  const p=products.find(x=>x.id===id);
+  const size=document.getElementById("size-"+id).value;
+  const item=cart.find(x=>x.id===id && x.size===size);
+
+  if(item) item.quantity++;
+  else cart.push({
+    id:p.id,
+    name:p.name,
+    price:p.price,
+    size:size,
+    quantity:1
+  });
+
+  updateCount();
+  alert("Товар добавлен в корзину");
+}
+
+function updateCount() {
+  document.getElementById("count").textContent =
+    cart.reduce((n,x)=>n+x.quantity,0);
+}
+
+function showCart() {
+  const panel=document.getElementById("cart");
+  panel.classList.remove("hidden");
+  renderCart();
+  panel.scrollIntoView({behavior:"smooth"});
+}
+
+function removeItem(index) {
+  cart.splice(index,1);
+  updateCount();
+  renderCart();
+}
+
+function clearCart() {
+  cart=[];
+  updateCount();
+  renderCart();
+}
+
+function getSubtotal() {
+  return cart.reduce(
+    (sum,x)=>sum+x.price*x.quantity,0
+  );
+}
+
+function renderCart() {
+  const subtotal=getSubtotal();
+  document.getElementById("cartItems").innerHTML =
+    cart.length
+    ? cart.map((x,i)=>`
+      <div class="cart-line">
+        <strong>${x.name}</strong><br>
+        Размер: ${x.size}<br>
+        Количество: ${x.quantity}<br>
+        ${money(x.price*x.quantity)}<br>
+        <button onclick="removeItem(${i})">
+          Удалить
+        </button>
+      </div>
+    `).join("")
+    : "<p>Корзина пуста</p>";
+
+  document.getElementById("subtotal").textContent =
+    "Товары: "+money(subtotal);
+
+  document.getElementById("delivery").textContent =
+    subtotal>=50000
+      ? "Доставка: бесплатно"
+      : "Доставка: стоимость уточняется";
+
+  document.getElementById("total").textContent =
+    "Сумма товаров: "+money(subtotal);
+}
+
+function showCheckout() {
+  if(!cart.length) {
+    alert("Добавьте товар в корзину");
+    return;
+  }
+  document.getElementById("checkout")
+    .classList.remove("hidden");
+  document.getElementById("checkout")
+    .scrollIntoView({behavior:"smooth"});
+}
+
+document.getElementById("orderForm")
+  .addEventListener("submit",function(e) {
+    e.preventDefault();
+
+    if(!cart.length) {
+      alert("Корзина пуста");
+      return;
+    }
+
+    const name=document.getElementById("customer").value;
+    const phone=document.getElementById("phone").value;
+    const address=document.getElementById("address").value;
+    const comment=document.getElementById("comment").value;
+    const subtotal=getSubtotal();
+
+    const lines=cart.map(x=>
+      `${x.name}, размер ${x.size}, `+
+      `${x.quantity} шт. — ${money(x.price*x.quantity)}`
+    ).join("\n");
+
+    const delivery=subtotal>=50000
+      ? "Бесплатно"
+      : "Уточняется у продавца";
+
+    const text=[
+      "Заказ Markys&Co.",
+      "",
+      lines,
+      "",
+      "Сумма товаров: "+money(subtotal),
+      "Доставка: "+delivery,
+      "",
+      "Имя: "+name,
+      "Телефон: "+phone,
+      "Адрес: "+address,
+      "Комментарий: "+comment,
+      "",
+      "Оплата: банковский перевод после подтверждения"
+    ].join("\n");
+
+    document.getElementById("orderText").value=text;
+    document.getElementById("orderResult")
+      .classList.remove("hidden");
+    document.getElementById("orderResult")
+      .scrollIntoView({behavior:"smooth"});
+  });
+
+async function copyOrder() {
+  const text=document.getElementById("orderText").value;
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("Заказ скопирован. Отправьте его в Direct.");
+  } catch(e) {
+    const field=document.getElementById("orderText");
+    field.select();
+    alert("Скопируйте выделенный текст вручную.");
+  }
+}
+
+renderProducts();
+updateCount();
+</script>
+</body>
+</html>
